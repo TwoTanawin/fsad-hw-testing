@@ -1,0 +1,40 @@
+<p style="color: green"><%= notice %></p>
+
+<%= render @project %>
+
+<div>
+  <%= link_to "Edit this project", edit_project_path(@project) %> |
+  <%= link_to "Back to projects", projects_path %>
+
+  <%= button_to "Destroy this project", @project, method: :delete %>
+</div>
+
+<h3>Add a Student to this Project</h3>
+
+<%= form_with(model: [@project, StudentProject.new], local: true, id: "new_student_project") do |form| %>
+  <div>
+    <%= form.label :student_id, "Select Student" %>
+    <%= form.collection_select :student_id, Student.all, :id, :name, prompt: "Choose a student" %>
+  </div>
+  <div>
+    <%= form.submit "Add Student" %>
+  </div>
+<% end %>
+
+<h3>Students in this Project</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Student ID</th>
+      <th>Name</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @project.students.each do |student| %>
+      <tr>
+        <td><%= student.studentid %></td>
+        <td><%= student.name %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

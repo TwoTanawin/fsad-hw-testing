@@ -1,0 +1,49 @@
+services:
+  project_tracker_db:
+    image: postgres:16
+    container_name: project_tracker_db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5433:5432"
+    networks:
+      - project_tracker_network
+
+  project_tracker_pgadmin:
+    image: dpage/pgadmin4
+    container_name: project_tracker_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "8081:80"
+    depends_on:
+      - project_tracker_db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - project_tracker_network
+
+  project_tracker_web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: project_tracker_web
+    image: project_tracker_web:0.1
+    command: bash -c "bundle exec rake db:create && bundle exec rake db:migrate && ./bin/rails server -b 0.0.0.0 -p 3000"
+    ports:
+      - "3000:3000"
+    networks:
+      - project_tracker_network
+    volumes:
+      - ./:/rails
+    depends_on:
+      - project_tracker_db
+
+volumes:
+  pgadmin_data:
+
+networks:
+  project_tracker_network:
+    external: true
